@@ -1,63 +1,8 @@
-import { getSession } from '@/utilities/session';
-import dbConnect from '@/lib/dbConnect';
-import Usermodel from '@/model/User.model';
-import { User } from 'next-auth';
-
-export async function POST(request: Request) {
-    await dbConnect();
-
-    const session = await getSession(request);
-    const user: User = session?.user as User;
-
-    if (!session || !session.user) {
-        return Response.json(
-            {
-                success: false,
-                message: 'Not Authenticated',
-            },
-            { status: 401 },
-        );
-    }
-
-    const userId = user._id;
-    const { acceptMessage } = await request.json();
-
-    try {
-
-        const updatedUser = await Usermodel.findByIdAndUpdate(
-            userId,
-            {isAcceptingMessage:acceptMessage},
-            {new:true}
-        )
-        
-        if(!updatedUser){
-            return Response.json(
-                {
-                    success: false,
-                    message: 'user not found',
-                },
-                { status: 404 },
-            );
-        }
-
-        return Response.json(
-            {
-                success: true,
-                message: 'message acceptance status updated successfully',
-            },
-            { status: 200 },
-        );
-    } catch (error) {
-        console.error('failed to accept Message', error);
-        return Response.json(
-            {
-                success: false,
-                message: 'failed to accept Message',
-            },
-            { status: 500 },
-        );
-    }
-}
+import dbConnect from "@/lib/dbConnect";
+import Usermodel from "@/model/User.model";
+import { getSession } from "next-auth/react";
+import { User } from "@/model/User.model";
+import mongoose from "mongoose";
 
 export async function GET(request:Request) {
     await dbConnect();
@@ -75,12 +20,17 @@ export async function GET(request:Request) {
         );
     }
 
-    const userId = user._id;
+    const userId = new mongoose.Types.ObjectId(user._id as string);
     
     try {
-        const foundUser = await Usermodel.findById(userId)
-    
-        if(!foundUser){
+        const user = await Usermodel.aggregate([
+            {$match:{id:userId}},
+            {$unwind:'$messages'},
+            {$sort:{'message.createdAt':-1}},
+            {$group:{_id:'$_id',messages:{$push:'$messages'}}}
+        ])
+
+        if(!user || user.length===0){
             return Response.json(
                 {
                     success: false,
@@ -89,22 +39,22 @@ export async function GET(request:Request) {
                 { status: 404 },
             );
         }
-    
+
         return Response.json(
             {
-                success: true,
-                isAcceptingMessages: foundUser.isAcceptingMessage,
+                success: false,
+                message: user[0].messages,
             },
             { status: 200 },
         );
     } catch (error) {
-        console.error('error in getting message acceptance status', error);
+        console.error("error occur in get-message");
         return Response.json(
             {
                 success: false,
-                message: 'error in getting message acceptance status',
+                message: "error occur in get-message"
             },
             { status: 500 },
-        );
+        )
     }
 }

@@ -3,7 +3,7 @@ import authOptions from "@/app/api/auth/[...nextauth].js/options";
 
 
 export async function getSession(request:Request){
-    const session = await Auth(request, handler)
+    const session = await Auth(request, authOptions)
 
     try {
         if(!session){
