@@ -46,12 +46,12 @@ const page = () => {
 
     useEffect(() => {
         const chechUsernameUnique = async () => {
-            if (debounced) {
+            if (username) {
                 setIsCheckingUsername(true);
                 setUsernameMessage('');
                 try {
                     const response = await axois.get(
-                        `/api/check-username-unique?username=${debounced}`,
+                        `/api/check-username-unique?username=${username}`,
                     );
                     setUsernameMessage(response.data.message);
                 } catch (error) {
@@ -66,7 +66,7 @@ const page = () => {
             }
         };
         chechUsernameUnique();
-    }, [debounced]);
+    }, [username]);
 
     const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
         setIsSubmitting(true);
@@ -118,7 +118,7 @@ const page = () => {
                                             {...field}
                                             onChange={(e) => {
                                                 field.onChange(e);
-                                                setUsername(e.target.value);
+                                                debounced(e.target.value);
                                             }}
                                         />
                                     </FormControl>
