@@ -17,11 +17,8 @@ const verifyCode = () => {
     const {toast} = useToast()
     const router = useRouter()
 
-    const form = useForm({
-        resolver: zodResolver(verifySchema),
-        defaultValues:{
-            code:""
-        }
+    const form = useForm<z.infer<typeof verifySchema>>({
+        resolver: zodResolver(verifySchema)
     });
 
     const onSubmit = async (data: z.infer<typeof verifySchema>) =>{
