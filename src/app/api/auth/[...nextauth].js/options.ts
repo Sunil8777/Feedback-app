@@ -1,10 +1,11 @@
-import NextAuth, { NextAuthConfig } from 'next-auth';
+import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import Usermodel from '@/model/User.model';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/dbConnect';
 
-export default {
+
+export const { handlers, signIn, signOut, auth } = NextAuth({
     providers: [
         Credentials({
             credentials: {
@@ -45,7 +46,7 @@ export default {
                     );
 
                     if (!isPasswordCorrect) {
-                        throw new Error('password is incoorect');
+                        throw new Error('password is incorrect');
                     }
 
                     return user;
@@ -82,4 +83,4 @@ export default {
         strategy: 'jwt',
     },
     secret: process.env.SECRET_KEY,
-} satisfies NextAuthConfig;
+})

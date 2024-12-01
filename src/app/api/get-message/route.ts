@@ -4,10 +4,10 @@ import { getSession } from "next-auth/react";
 import { User } from "@/model/User.model";
 import mongoose from "mongoose";
 
-export async function GET(request:Request) {
+export async function GET(req:Request) {
     await dbConnect();
 
-    const session = await getSession(request);
+    const session = await getSession()
     const user: User = session?.user as User;
 
     if (!session || !session.user) {

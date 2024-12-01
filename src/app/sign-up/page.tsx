@@ -1,4 +1,5 @@
 'use client';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -7,7 +8,6 @@ import { useEffect, useState } from 'react';
 import { useDebounceCallback } from 'usehooks-ts';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { signInSchema } from '@/schema/signInSchema';
 import { ApiError } from 'next/dist/server/api-utils';
 import { signUpSchema } from '@/schema/signUpSchema';
 import { ApiResponse } from '@/types/ApiResponse';
@@ -35,7 +35,7 @@ const page = () => {
     const router = useRouter();
 
     const form = useForm({
-        resolver: zodResolver(signInSchema),
+        resolver: zodResolver(signUpSchema),
         defaultValues: {
             username: '',
             email: '',
