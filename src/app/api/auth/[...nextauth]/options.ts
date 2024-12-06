@@ -36,7 +36,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
                     if (!user.isVerified) {
                         throw new Error(
-                            'please verify your account first brfore login',
+                            'please verify your account first before login',
                         );
                     }
 
@@ -69,8 +69,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         async session({ session, token }) {
             if (token) {
                 session.user._id = token._id?.toString();
-                session.user.isVerified = !!token.isVerified;
-                session.user.isAcceptingMessage = !!token.isAcceptingMessage;
+                session.user.isVerified = token.isVerified as boolean;
+                session.user.isAcceptingMessage = token.isAcceptingMessage as boolean;
                 session.user.username = token.username?.toString();
             }
             return session;

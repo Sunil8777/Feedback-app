@@ -33,7 +33,7 @@ const verifyCode = () => {
                 title:"success",
                 description: response.data.message
             })
-            router.replace('sign-in')
+            router.replace('/sign-in')
         } catch (error) {
             const axoisError = error as AxiosError<ApiError>;
             const errorMessage = axoisError.response?.data.message;

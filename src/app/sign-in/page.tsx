@@ -34,7 +34,7 @@ const page = () => {
     const onSubmit = async (data: z.infer<typeof signInSchema>) => {
         const result = await signIn('credentials',{
           redirect:false,
-          identifier: data.email,
+          email: data.email,
           password: data.password
         })
 
