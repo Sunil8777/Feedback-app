@@ -21,15 +21,16 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { CheckCircle, Loader2, X } from 'lucide-react';
 
 const page = () => {
     const [username, setUsername] = useState('');
     const [usernameMessage, setUsernameMessage] = useState('');
     const [isCheckingUsername, setIsCheckingUsername] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [emailTaken,setEmailTaken] = useState(false)
 
-    const debounced = useDebounceCallback(setUsername, 400);
+    const debounced = useDebounceCallback(setUsername, 300);
 
     const { toast } = useToast();
     const router = useRouter();
@@ -82,6 +83,7 @@ const page = () => {
         } catch (error) {
             const axoisError = error as AxiosError<ApiError>;
             const errorMessage = axoisError.response?.data.message;
+            if(errorMessage === 'User already exist with this email') setEmailTaken(true)
 
             toast({
                 title: 'signUp failed',
@@ -122,7 +124,19 @@ const page = () => {
                                         />
                                     </FormControl>
                                     <FormMessage />
+                                    {usernameMessage && (usernameMessage === "Username is unique" || usernameMessage === "Username is already taken") &&
+                                    (
+                                        <div className={`flex items-center space-x-2 ${usernameMessage === "Username is unique" ? "text-green-500" : "text-red-500"}`}>
+                                            {usernameMessage === "Username is unique" ? (
+                                                <CheckCircle className="h-5 w-5 text-green-500" />
+                                            ) : (
+                                                <X className="h-5 w-5 text-red-500" />
+                                            )}
+                                            <p className="font-medium">{usernameMessage}</p>
+                                        </div>
+                                    )}
                                 </FormItem>
+
                             )}
                         />
                         <FormField
@@ -135,6 +149,14 @@ const page = () => {
                                         <Input placeholder="email" {...field} />
                                     </FormControl>
                                     <FormMessage />
+                                    {
+                                        emailTaken?(
+                                            <div className= 'flex items-center space-x-2'>
+                                                <X className="h-5 w-5 text-red-500" />
+                                                <p className= 'text-red-500' >User already exist with this email</p>
+                                            </div>
+                                        ):(null)
+                                    }
                                 </FormItem>
                             )}
                         />

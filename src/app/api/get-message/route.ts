@@ -8,7 +8,7 @@ export async function GET() {
   await dbConnect();
 
   const session = await auth();
-  const user: User = session?.user as User;
+  const user: User = session?.user as User; 
 
   if (!session || !session.user) {
     return Response.json(
@@ -24,9 +24,9 @@ export async function GET() {
 
   try {
     const user = await Usermodel.aggregate([
-      { $match: { id: userId } },
+      { $match: { _id: userId } },
       { $unwind: "$messages" },
-      { $sort: { "message.createdAt": -1 } },
+      { $sort: { "messages.createdAt": -1 } },
       { $group: { _id: "$_id", messages: { $push: "$messages" } } },
     ]);
 
@@ -43,7 +43,7 @@ export async function GET() {
     return Response.json(
       {
         success: false,
-        message: user[0].messages,
+        messages: user[0].messages,
       },
       { status: 200 }
     );

@@ -44,7 +44,7 @@ const MessageCard = ({message,onMessageDelete}:MessageCardProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Card Title</CardTitle>
+        <CardTitle>{message.content}</CardTitle>
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="destructive"><X className="w-5 h-5"></X></Button>
@@ -63,7 +63,6 @@ const MessageCard = ({message,onMessageDelete}:MessageCardProps) => {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-        <CardDescription>Card Description</CardDescription>
       </CardHeader>
     </Card>
   );

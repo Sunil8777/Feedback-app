@@ -9,6 +9,8 @@ export async function POST(request: Request) {
   const session = await auth();
   const user: User = session?.user as User;
 
+  console.log(session)
+
   if (!session || !session.user) {
     return Response.json(
       {
@@ -21,8 +23,6 @@ export async function POST(request: Request) {
 
   const userId = user._id;
   const { acceptMessage } = await request.json();
-
-  console.log(acceptMessage);
 
   try {
     const updatedUser = await Usermodel.findByIdAndUpdate(

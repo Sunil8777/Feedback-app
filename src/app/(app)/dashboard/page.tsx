@@ -40,7 +40,7 @@ const page = () => {
   const fetchAcceptMessage = useCallback(async () =>{
     SetIsSwitchLoading(true)
     try {
-      const response = await axios.get('/api/accept-messages')
+      const response = await axios.get('/api/accept-message')
       setValue('acceptMessages',response.data.isAcceptingMessage)
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>
@@ -58,7 +58,7 @@ const page = () => {
     SetIsSwitchLoading(false)
 
     try {
-      const response = await axios.get<ApiResponse>('/api/get-messages')
+      const response = await axios.get<ApiResponse>('/api/get-message')
       setMessages(response.data.messages || [])
       if(refresh){
         toast({
@@ -79,14 +79,17 @@ const page = () => {
   },[setIsLoading,setMessages])
 
   useEffect(()=>{
-    if(!session || !session.user) return
-    fetchMessages()
-    fetchAcceptMessage()
+    if (!session || !session.user) {
+        console.log('No session or user found');
+        return;
+    }
+    fetchMessages();
+    fetchAcceptMessage();
   },[session,setValue, fetchAcceptMessage,fetchMessages])
 
   const handleSwitchChange = async () =>{
     try {
-      const response = await axios.post<ApiResponse>('api/accept-messages',{acceptMessage:!acceptMessages})
+      const response = await axios.post<ApiResponse>('api/accept-message',{acceptMessage:!acceptMessages})
       setValue('acceptMessages',!acceptMessages)
       toast({
         title: response.data.message,
