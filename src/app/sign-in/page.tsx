@@ -17,8 +17,12 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { signInSchema } from '@/schema/signInSchema';
 import { signIn } from 'next-auth/react';
+import { Loader2 } from 'lucide-react';
+import { useState } from 'react';
 
 const page = () => {
+
+    const [isLoading,setIsLoading] = useState(false);
 
     const { toast } = useToast();
     const router = useRouter();
@@ -32,22 +36,33 @@ const page = () => {
     });
 
     const onSubmit = async (data: z.infer<typeof signInSchema>) => {
-        const result = await signIn('credentials',{
-          redirect:false,
-          email: data.email,
-          password: data.password
-        })
-
-        if(result?.error){
-          toast({
-            title:"Login failed",
-            description: "Incorrect username or password",
-            variant:"destructive"
-          })
-        }
-
-        if(result?.url){
-          router.replace('/dashboard')
+        try {
+            setIsLoading(true)
+            const result = await signIn('credentials',{
+              redirect:false,
+              email: data.email,
+              password: data.password
+            })
+    
+            if(result?.error){
+              toast({
+                title:"Login failed",
+                description: "Incorrect username or password",
+                variant:"destructive"
+              })
+            }
+    
+            if(result?.url){
+              router.replace('/dashboard')
+            }
+        } catch (error) {
+            toast({
+                title:"Login failed",
+                description: "Something wrong happen",
+                variant:"destructive"
+              })
+        }finally{
+            setIsLoading(false)
         }
     };
     return (
@@ -93,9 +108,16 @@ const page = () => {
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit">
-                          Signin
-                        </Button>
+                        {isLoading ? (
+                            <Button disabled>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Please wait
+                            </Button>
+                            ) : (
+                            <Button type="submit" disabled={isLoading}>
+                                Sign in
+                            </Button>
+                        )}
                     </form>
                 </Form>
             </div>

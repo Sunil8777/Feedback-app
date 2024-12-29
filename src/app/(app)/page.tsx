@@ -8,8 +8,11 @@ import {
 } from "@/components/ui/carousel"
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Mail } from 'lucide-react'
+import Link from "next/link";
+import { auth } from '../api/auth/[...nextauth]/options'
 
-const Home = () => {
+const Home = async () => {
+  const session = await auth()
   return (
     <>
       <main className="flex-grow flex flex-col items-center justify-center px-4 md:px-24 py-12 bg-gray-800 text-white">
@@ -48,8 +51,17 @@ const Home = () => {
           <CarouselPrevious className='bg-slate-800'/>
           <CarouselNext className='bg-slate-800'/>
         </Carousel>
+        {
+          session?
+          (
+            <Link href={"/dashboard"}>
+              <button className='px-16 py-3 bg-black rounded-lg mt-10' >Dashboard</button>
+            </Link>
+          ):
+          null
+        }
       </main>
-
+      
        <footer className="text-center p-4 md:p-6 bg-gray-900 text-white">
         © 2023 True Feedback. All rights reserved.
       </footer>

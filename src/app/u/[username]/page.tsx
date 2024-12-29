@@ -8,7 +8,6 @@ import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { CardHeader, CardContent, Card } from "@/components/ui/card";
-import { useCompletion } from "ai/react";
 import {
   Form,
   FormControl,
@@ -27,12 +26,12 @@ import { messageSchema } from "@/schema/messageSchema";
 
 const specialChar = "||";
 
-const parseStringMessages = (messageString: string): string[] => {
-  return messageString.split(specialChar);
-};
+const initialMessageString = [
+  "What's your favorite movie?",
+  "Do you have any pets?",
+  "What's your dream job?"
+];
 
-const initialMessageString =
-  "What's your favorite movie?||Do you have any pets?||What's your dream job?";
 
 export default function SendMessage() {
   const { toast } = useToast();
@@ -40,15 +39,8 @@ export default function SendMessage() {
   const params = useParams<{ username: string }>();
   const username = params.username;
 
-  const {
-    complete,
-    completion,
-    isLoading: isSuggestLoading,
-    error,
-  } = useCompletion({
-    api: "/api/suggest-messages",
-    initialCompletion: initialMessageString,
-  });
+  const [messages,setMessages] = useState(initialMessageString);
+  const [isSuggestLoading,setIsSuggestLoading] = useState(false);
 
   const form = useForm<z.infer<typeof messageSchema>>({
     resolver: zodResolver(messageSchema),
@@ -90,10 +82,18 @@ export default function SendMessage() {
 
   const fetchSuggestedMessages = async () => {
     try {
-      complete("");
+      setIsSuggestLoading(true)
+      const response = await axios.post<any>('/api/suggest-message')
+      setMessages(response.data.text.split(specialChar))
     } catch (error) {
-      console.error("Error fetching messages:", error);
-      // Handle error appropriately
+        console.error("Error fetching messages:", error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch suggested messages",
+          variant: "destructive",
+        });
+    }finally{
+      setIsSuggestLoading(false)
     }
   };
 
@@ -151,10 +151,8 @@ export default function SendMessage() {
             <h3 className="text-xl font-semibold">Messages</h3>
           </CardHeader>
           <CardContent className="flex flex-col space-y-4">
-            {error ? (
-              <p className="text-red-500">{error.message}</p>
-            ) : (
-              parseStringMessages(completion).map((message, index) => (
+            { (
+              messages.map((message, index) => (
                 <Button
                   key={index}
                   variant="outline"
